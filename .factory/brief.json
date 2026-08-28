@@ -1,0 +1,12 @@
+{
+  "slug": "repo-protocol-gate",
+  "title": "Repo Protocol Gate",
+  "territory": "devtools-data",
+  "user": "Engineering teams allowing coding agents to modify repositories who need repository rules such as migration ownership and protected files enforced deterministically in CI.",
+  "smallest_useful_product": "A CI/local CLI with repo-protocol.yaml rules for protected paths, allowed generators, required metadata, and change relationships; it returns line-level, human-readable denials.",
+  "success_measure": "In a fixture repository, the gate blocks every prohibited migration/README change and allows all compliant generated changes with setup under 15 minutes.",
+  "artifact_class": "cli",
+  "monetization": "free",
+  "constraints": "Rules must be deterministic and versioned; no LLM judge in the enforcement path; permit an explicit audited override.",
+  "state": "RESEARCHED"
+}
