@@ -35,9 +35,11 @@ try {
   });
   const page = await context.newPage();
   const consoleErrors = [];
+  const requestOrigins = new Set();
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
+  page.on("request", (request) => requestOrigins.add(new URL(request.url()).origin));
 
   await page.goto(baseURL, { waitUntil: "networkidle" });
   if ((await page.title()) !== "Repo Protocol Gate — make repository rules enforceable") {
@@ -55,6 +57,15 @@ try {
     if (!box || box.width < 44 || box.height < 44) {
       throw new Error(`${name} must have a 44 by 44 CSS pixel touch target`);
     }
+  }
+  await page.getByRole("button", { name: "Blocked README" }).click();
+  if ((await page.locator("#verdict-title").textContent()) !== "Change denied") {
+    throw new Error("Desktop demo should deny a protected README change");
+  }
+  const desktopAccessibility = await new AxeBuilder({ page }).analyze();
+  const desktopSerious = desktopAccessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact));
+  if (desktopSerious.length) {
+    throw new Error(`Desktop axe serious/critical violations: ${JSON.stringify(desktopSerious, null, 2)}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
 
@@ -100,6 +111,9 @@ try {
   if (consoleErrors.length) {
     throw new Error(`Console errors: ${consoleErrors.join(" | ")}`);
   }
+  if ([...requestOrigins].some((origin) => origin !== baseURL)) {
+    throw new Error(`Privacy regression: cross-origin requests observed: ${[...requestOrigins].join(", ")}`);
+  }
 
   const deployment = JSON.parse(
     await readFile(new URL("../dist/site/staticwebapp.config.json", import.meta.url), "utf8"),
@@ -117,7 +131,7 @@ try {
     throw new Error("Deployment CSP must prevent framing");
   }
 
-  console.log("site smoke: mobile interactions, touch targets, deployment headers, console, and axe passed");
+  console.log("site smoke: desktop/mobile interactions, touch targets, privacy, deployment headers, console, and axe passed");
 } finally {
   if (browser) await browser.close();
   server.kill("SIGTERM");
