@@ -1,100 +1,77 @@
-# Handoff: Repo Protocol Gate v0.1.0
+# Handoff — independent verification
 
-## What was built
+## Status: FAIL
 
-- A Rust single-binary CLI at `cli/` with three non-interactive commands:
-  `init`, `validate`, and `check`.
-- Versioned `repo-protocol.yaml` rules for protected Git globs, change types,
-  trusted change classes, approved generators, required metadata, and
-  `changed_any_of` / `changed_all_of` relationships.
-- Git range and staged-index inspection, including add/modify/delete/rename
-  parsing. When no mode is supplied, the CLI checks staged changes first and
-  otherwise checks `HEAD^..HEAD`.
-- SHA-256-bound generator evidence read from the same Git snapshot being
-  checked. An absolute `--evidence` path supports evidence emitted by a trusted
-  CI generator wrapper outside the checkout.
-- Human-readable denials that point to `repo-protocol.yaml:<line>`, stable JSON
-  reports, and exit codes 0 (allow), 1 (deny), and 2 (input/config/Git error).
-- Emergency overrides that require actor + reason, retain the original
-  violations, and append a JSONL audit record or emit it to CI stderr.
-- A surreal editorial static documentation site with an original generated
-  checkpoint scene, responsive image variants, install/reference content, and
-  a local-only live policy inspector.
-- First-class allowed, denied, empty, malformed-input, keyboard, reduced-motion,
-  and offline demo states. A small service worker caches the shell.
-- README usage/API contract, CHANGELOG, MIT license, brief, visual thesis, asset
-  provenance, caching headers, robots metadata, and sitemap.
+Tested candidate: `6d03f3753d4ad633e52143b40e752299bd1ff571`
 
-The product is free and has no accounts, payment, analytics, telemetry, or
-stored user data, so separate `/privacy` and `/terms` pages are not applicable.
+Tested deployment: `https://repo-protocol-gate.sociobot.in/`
 
-## Run and verify
+Date: 2026-08-28 UTC
 
-Requirements: Rust stable and Node.js 20+.
+The deployment is live and byte-identical to the candidate's production site
+artifacts. Build, repository tests, static checks, packaging, browser behavior,
+accessibility, privacy, offline reload, and performance are otherwise healthy.
+The release is rejected because the CLI's core generated-file enforcement can
+be bypassed.
 
-```sh
-npm install
-npm test
-npm run check
-npm run build
-```
+## Blocking evidence
 
-The exact deployment build command is `npm run build`. Static output is
-`dist/site/` with `index.html` at that root. The optimized CLI is
-`target/release/repo-protocol`.
+1. **High — unbound generated evidence is accepted.** A staged handwritten
+   migration plus its schema companion and a valid-looking evidence document
+   whose `changes` array was empty returned exit 0 / `status: allowed` when run
+   with `--change-class generated`. The migration had no evidence entry and no
+   bound SHA-256. With no evidence document, the same change-class path panics
+   and exits 101 rather than returning the documented error code 2. See
+   `.factory/verification.md` for the exact fixture and output.
+2. **Medium — automatic-range JSON is polluted.** With no staged changes,
+   `repo-protocol check --json` prints the resolved `HEAD^` SHA before the JSON
+   object, so parsers fail. Explicit `--staged` and `--base/--head` JSON paths
+   work.
+3. **Medium — live caching is misconfigured.** Hashed assets and `/sw.js` all
+   return `Cache-Control: public, must-revalidate, max-age=30`; the committed
+   policy requests one-year immutable assets and a non-cached service worker.
+4. **Low — touch targets.** The `Try it` and footer `GitHub` text links measure
+   42x44 CSS px, two pixels below the 44x44 baseline.
+5. **Advisory — response hardening.** HSTS, nosniff, referrer, and permissions
+   headers are present; CSP and a framing restriction are absent.
 
-Release packaging was verified with:
+## Verification completed
 
-```sh
-cargo package --manifest-path cli/Cargo.toml --allow-dirty
-```
+- Clean detached checkout at the candidate SHA; `origin/main` independently
+  confirmed at the same SHA before reporting.
+- `npm ci`, `npm test`, `npm run check`, exact `npm run build`, and
+  `npm audit --audit-level=high` passed.
+- Rust results: 5 unit tests and 6 integration tests passed; formatting,
+  Clippy with warnings denied, and strict TypeScript passed.
+- `cargo package --manifest-path cli/Cargo.toml --locked` passed. The 14,858-byte
+  crate was installed into a clean Cargo root and the installed CLI was used
+  for independent fixtures.
+- Protected README denial, human allow, valid migration, missing relationship,
+  artifact tamper, override boundary/audit, malformed policy, init collision,
+  staged snapshot, explicit range, and automatic range paths were exercised.
+- Live HTML and every shipped runtime asset matched local build hashes.
+- Desktop 1440x1000 and mobile 390x844 passed visual/responsive checks; no
+  horizontal overflow, console errors, page errors, or failed requests.
+- Keyboard traversal, focus, skip link, empty/error recovery, 200% text,
+  reduced motion, and offline reload were exercised. Axe found 0
+  serious/critical issues.
+- Lighthouse mobile runs: performance 96/98/99; full run 98/100/100/100.
+  Median LCP 1.5 s, FCP 1.2–1.8 s, TBT 30–180 ms, CLS 0–0.001. JS 5.30 KiB,
+  CSS 15.48 KiB, fonts 72.90 KiB, mobile hero 25.37 KiB.
+- Privacy passed: no cross-origin requests, analytics, cookies, local/session
+  storage, or IndexedDB. No API, unlock endpoint, sign-in, or backend exists,
+  so rate-limiting and Entra checks are not applicable.
 
-The resulting crate is `target/package/repo-protocol-0.1.0.crate`; it contained
-8 files, 55.1 KiB unpacked / 14.5 KiB compressed, and Cargo's clean unpacked
-verification build passed. Registry credentials are factory-owned, so nothing
-was published.
+## Required next steps
 
-## Verification results
-
-Final local checks on 2026-08-28:
-
-- `npm test`: passed. Rust: 5 unit tests + 6 end-to-end CLI fixture tests;
-  browser: mobile interaction, keyboard, empty/error/offline states, zero
-  console errors, and zero serious/critical axe findings.
-- `npm run check`: passed `cargo fmt --check`, Clippy with warnings denied, and
-  strict TypeScript checking.
-- `npm run build`: passed and produced both the release binary and `dist/site/`.
-- `npm audit --audit-level=high`: 0 vulnerabilities.
-- Factory `verify-url.sh` against the production preview: HTTP 200, load 687 ms,
-  title/lang/main present, exactly one h1, all images have alt text, all buttons
-  are named, and no browser console errors.
-- Lighthouse 12.8.2, mobile throttling against the final production preview:
-  performance **99**, accessibility **100**, best practices **100**, SEO
-  **100**; FCP **1.5 s**, LCP **1.7 s**, TBT **0 ms**, CLS **0**.
-- Shipped initial asset sizes: JS 5.30 KiB, CSS 15.48 KiB, fonts 72.89 KiB;
-  responsive hero variants 25–100 KiB. All are below the product budgets.
-- Visual inspection completed at 1440×1000 and 390×844. Content stacks without
-  horizontal clipping, and touch targets remain at least 44px.
-
-## Trust boundary and known gaps
-
-- The CLI verifies that generator evidence names an allowed generator and is
-  bound to the exact checked artifact. It does not cryptographically prove who
-  produced an evidence document. For adversarial pull requests, the workflow
-  must create evidence in a trusted generator step outside the checkout and
-  pass its absolute path; do not accept PR-authored evidence as provenance.
-- `--change-class`, override identity, and the evidence path are trusted CI
-  inputs and must not be assembled from untrusted pull-request content.
-- Linux was the release/test platform in this work order. The implementation
-  uses portable Rust and Git commands, but Windows/macOS release binaries were
-  not cross-tested here.
-- Deployment, registry publication, and release-binary signing remain factory
-  operations; no infrastructure, DNS, billing, or registry state was changed.
-
-## Recommended next steps
-
-1. Build and sign Linux, macOS, and Windows binaries from the committed tag.
-2. Publish the verified crate and attach binaries to the GitHub release.
-3. Deploy `dist/site/` to `repo-protocol-gate.sociobot.in`.
-4. In consuming repositories, keep the generator-evidence writer in a trusted
-   CI workflow and upload override JSONL as a retained build artifact.
+1. Make `generated` effective only when the current artifact has a valid
+   evidence entry and matching SHA; return a structured exit-2 error instead
+   of panicking when evidence is absent.
+2. Silence the internal `git rev-parse` probe so every `--json` mode emits one
+   parseable document, then add regression tests for default range mode.
+3. Correct production cache rules for hashed assets and `/sw.js` and verify
+   them at the public URL.
+4. Expand the two 42px text-link hit areas to at least 44px and consider CSP
+   with `frame-ancestors`.
+5. Re-run the full independent suite documented in
+   `.factory/verification.md` before release.
