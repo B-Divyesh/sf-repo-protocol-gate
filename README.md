@@ -70,6 +70,11 @@ Generated changes carry evidence in `.repo-protocol/evidence.json`. Each
 listed artifact is bound to its exact content; editing it after generation
 invalidates the evidence.
 
+The evidence document is a trust boundary. For adversarial CI, have a trusted
+generator wrapper write it outside the checkout and pass that absolute path
+with `--evidence`; do not let untrusted pull-request steps write the evidence
+artifact. The repository-relative default is convenient for local workflows.
+
 ```json
 {
   "version": 1,
@@ -166,7 +171,8 @@ https://repo-protocol-gate.sociobot.in.
 Repo Protocol Gate runs locally, reads only the configured Git diff and policy
 evidence, and sends nothing over the network. The documentation demo runs
 entirely in the browser and stores nothing. Treat change class flags and
-override actor values as trusted CI inputs.
+override actor values as trusted CI inputs. Treat the generator evidence path
+the same way when provenance must resist a malicious contributor.
 
 ## License
 

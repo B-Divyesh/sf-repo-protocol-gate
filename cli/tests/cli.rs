@@ -147,6 +147,37 @@ fn edited_generated_file_invalidates_evidence() {
 }
 
 #[test]
+fn generator_metadata_and_relationship_are_all_enforced() {
+    let root = fixture();
+    fs::create_dir_all(root.join("db/migrations")).unwrap();
+    fs::create_dir_all(root.join(".repo-protocol")).unwrap();
+    let migration = b"CREATE TABLE users(id int);\n";
+    fs::write(root.join("db/migrations/0042_users.sql"), migration).unwrap();
+    let hash = format!("{:x}", Sha256::digest(migration));
+    let evidence = serde_json::json!({
+        "version": 1,
+        "generator": "manual-script",
+        "metadata": { "ticket": "ENG-204" },
+        "changes": [{ "path": "db/migrations/0042_users.sql", "sha256": hash }]
+    });
+    fs::write(
+        root.join(".repo-protocol/evidence.json"),
+        serde_json::to_vec(&evidence).unwrap(),
+    )
+    .unwrap();
+    git(&root, &["add", "."]);
+
+    let output = gate(&root, &["check", "--staged"]);
+    assert_eq!(output.status.code(), Some(1));
+    let report = String::from_utf8_lossy(&output.stdout);
+    assert!(report.contains("generator `manual-script` is not allowed"));
+    assert!(report.contains("missing metadata: source"));
+    assert!(report.contains("companion change matching one of: db/schema/**"));
+
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn explicit_override_keeps_denials_and_writes_audit() {
     let root = fixture();
     fs::write(root.join("README.md"), "# Emergency edit\n").unwrap();
@@ -171,6 +202,25 @@ fn explicit_override_keeps_denials_and_writes_audit() {
     let audit = fs::read_to_string(root.join("audit.jsonl")).unwrap();
     assert!(audit.contains("oncall@example.com"));
     assert!(audit.contains("INC-481"));
+
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn json_mode_keeps_configuration_errors_machine_readable() {
+    let root = fixture();
+    fs::write(root.join("repo-protocol.yaml"), "version: 99\nrules: []\n").unwrap();
+
+    let output = gate(&root, &["validate", "--json"]);
+    assert_eq!(output.status.code(), Some(2));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["status"], "error");
+    assert!(
+        report["message"]
+            .as_str()
+            .unwrap()
+            .contains("unsupported policy version")
+    );
 
     fs::remove_dir_all(root).unwrap();
 }

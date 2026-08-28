@@ -87,6 +87,11 @@ struct InitArgs {
 
 fn main() {
     let cli = Cli::parse();
+    let wants_json = matches!(
+        &cli.command,
+        Command::Check(CheckArgs { json: true, .. })
+            | Command::Validate(ValidateArgs { json: true, .. })
+    );
     let code = match cli.command {
         Command::Check(args) => repo_protocol::run_check(repo_protocol::CheckOptions {
             config: args.config,
@@ -104,7 +109,14 @@ fn main() {
     };
 
     if let Err(error) = code {
-        eprintln!("repo-protocol: {error}");
+        if wants_json {
+            println!(
+                "{}",
+                serde_json::json!({ "status": "error", "message": error.to_string() })
+            );
+        } else {
+            eprintln!("repo-protocol: {error}");
+        }
         std::process::exit(2);
     }
 }

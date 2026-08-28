@@ -102,7 +102,8 @@ depth remains through scale, overlap, texture, and borders.
   vermilion #F15A3C, saffron #F4B942, celadon #A8C9B8. Constraints: no words,
   no letters, no logos, no UI screenshot, no gradients, no generic
   cybersecurity shield, no photorealism, no watermark.”
-- Output: generated as 1536×1024 PNG, then resized/optimized to WebP at ≤300 KB.
+- Output: generated as 1536×1024 PNG, then resized/optimized to responsive
+  640, 768, 960, and 1280px WebP variants (25–100 KB; all below 300 KB).
 - Alt intent: “A vermilion checkpoint in a paper night landscape sorts code
   sheets onto an orderly golden path.”
 
