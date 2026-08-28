@@ -167,7 +167,10 @@ footer nav {
 footer nav a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 44px;
   min-height: 44px;
+  padding: 0 2px;
   color: var(--mist);
   font-family: var(--mono);
   font-size: 0.78rem;

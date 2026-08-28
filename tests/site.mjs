@@ -1,6 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
 
 const port = 4179;
 const baseURL = `http://127.0.0.1:${port}`;
@@ -48,6 +49,14 @@ try {
   if (!(await page.locator(".hero-scene img").getAttribute("alt"))) {
     throw new Error("Hero image is missing meaningful alt text");
   }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  for (const name of ["Try it", "GitHub"]) {
+    const box = await page.getByRole("link", { name, exact: true }).boundingBox();
+    if (!box || box.width < 44 || box.height < 44) {
+      throw new Error(`${name} must have a 44 by 44 CSS pixel touch target`);
+    }
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
 
   await page.getByRole("button", { name: "Blocked README" }).focus();
   await page.keyboard.press("Enter");
@@ -92,7 +101,23 @@ try {
     throw new Error(`Console errors: ${consoleErrors.join(" | ")}`);
   }
 
-  console.log("site smoke: mobile interactions, empty/error states, console, and axe passed");
+  const deployment = JSON.parse(
+    await readFile(new URL("../dist/site/staticwebapp.config.json", import.meta.url), "utf8"),
+  );
+  const cacheRules = new Map(
+    deployment.routes.map((route) => [route.route, route.headers?.["Cache-Control"]]),
+  );
+  if (cacheRules.get("/assets/*") !== "public, max-age=31536000, immutable") {
+    throw new Error("Hashed assets must have immutable one-year cache headers");
+  }
+  if (cacheRules.get("/sw.js") !== "no-cache") {
+    throw new Error("The service worker must not be cached");
+  }
+  if (!deployment.globalHeaders["Content-Security-Policy"]?.includes("frame-ancestors 'none'")) {
+    throw new Error("Deployment CSP must prevent framing");
+  }
+
+  console.log("site smoke: mobile interactions, touch targets, deployment headers, console, and axe passed");
 } finally {
   if (browser) await browser.close();
   server.kill("SIGTERM");

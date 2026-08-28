@@ -147,6 +147,86 @@ fn edited_generated_file_invalidates_evidence() {
 }
 
 #[test]
+fn generated_class_cannot_bypass_missing_hash_bound_entry() {
+    let root = fixture();
+    fs::create_dir_all(root.join("db/migrations")).unwrap();
+    fs::create_dir_all(root.join("db/schema")).unwrap();
+    fs::create_dir_all(root.join(".repo-protocol")).unwrap();
+    fs::write(root.join("db/migrations/0042_users.sql"), "handwritten\n").unwrap();
+    fs::write(root.join("db/schema/users.sql"), "table users\n").unwrap();
+    let evidence = serde_json::json!({
+        "version": 1,
+        "generator": "drizzle-kit",
+        "metadata": { "ticket": "ENG-204", "source": "db/schema/users.sql" },
+        "changes": []
+    });
+    fs::write(
+        root.join(".repo-protocol/evidence.json"),
+        serde_json::to_vec(&evidence).unwrap(),
+    )
+    .unwrap();
+    git(&root, &["add", "."]);
+
+    let output = gate(
+        &root,
+        &["check", "--staged", "--change-class", "generated", "--json"],
+    );
+    assert_eq!(output.status.code(), Some(1));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["status"], "denied");
+    assert!(
+        report["violations"][0]["message"]
+            .as_str()
+            .unwrap()
+            .contains("hash-bound entry")
+    );
+    assert!(!String::from_utf8_lossy(&output.stderr).contains("panicked"));
+
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn generated_class_without_evidence_is_a_structured_input_error() {
+    let root = fixture();
+    fs::create_dir_all(root.join("db/migrations")).unwrap();
+    fs::write(root.join("db/migrations/0042_users.sql"), "handwritten\n").unwrap();
+    git(&root, &["add", "."]);
+
+    let output = gate(
+        &root,
+        &["check", "--staged", "--change-class", "generated", "--json"],
+    );
+    assert_eq!(output.status.code(), Some(2));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["status"], "error");
+    assert!(
+        report["message"]
+            .as_str()
+            .unwrap()
+            .contains("requires an evidence document")
+    );
+    assert!(!String::from_utf8_lossy(&output.stderr).contains("panicked"));
+
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn automatic_range_json_is_a_single_parseable_document() {
+    let root = fixture();
+    fs::write(root.join("README.md"), "# Human update\n").unwrap();
+    git(&root, &["add", "README.md"]);
+    git(&root, &["commit", "-qm", "human update"]);
+
+    let output = gate(&root, &["check", "--change-class", "human", "--json"]);
+    assert!(output.status.success());
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["status"], "allowed");
+    assert_eq!(report["changes_checked"], 1);
+
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn generator_metadata_and_relationship_are_all_enforced() {
     let root = fixture();
     fs::create_dir_all(root.join("db/migrations")).unwrap();

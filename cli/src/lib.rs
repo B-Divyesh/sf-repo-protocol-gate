@@ -522,8 +522,10 @@ fn has_staged_changes() -> AppResult<bool> {
 fn git_success<const N: usize>(args: [&str; N]) -> AppResult<bool> {
     Command::new("git")
         .args(args)
-        .status()
-        .map(|status| status.success())
+        // `status()` inherits stdout. The automatic-range HEAD^ probe must
+        // not prepend a SHA to a requested JSON report.
+        .output()
+        .map(|output| output.status.success())
         .map_err(|error| AppError(format!("could not run git: {error}")))
 }
 
@@ -655,8 +657,18 @@ fn evaluate(
             }
             protected.insert(change.path.as_str());
             let evidence_state = evidence_for(change, evidence, options)?;
+            // `generated` is derived from a hash-bound evidence entry. It is
+            // never an ordinary class that a caller can assert for a file.
+            if ordinary_class == "generated" && evidence.is_none() {
+                return Err(AppError(format!(
+                    "generated change class for `{}` requires an evidence document with a hash-bound entry",
+                    change.path
+                )));
+            }
             let effective_class = if evidence_state.valid {
                 "generated"
+            } else if ordinary_class == "generated" {
+                "unverified-generated"
             } else {
                 ordinary_class
             };
@@ -669,6 +681,12 @@ fn evaluate(
                 .any(|allowed| allowed == effective_class)
             {
                 let message = evidence_state.problem.unwrap_or_else(|| {
+                    if ordinary_class == "generated" {
+                        return format!(
+                            "generated change class requires a hash-bound evidence entry for `{}`",
+                            change.path
+                        );
+                    }
                     format!(
                         "change class `{effective_class}` is not allowed; expected {}",
                         compiled.rule.allow.change_classes.join(", ")
@@ -786,7 +804,10 @@ fn evidence_for(
     else {
         return Ok(EvidenceState {
             valid: false,
-            problem: None,
+            problem: Some(format!(
+                "generator evidence has no hash-bound entry for `{}`",
+                change.path
+            )),
         });
     };
     if change.change_type == ChangeType::Deleted {

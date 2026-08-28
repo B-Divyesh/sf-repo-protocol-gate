@@ -128,8 +128,8 @@ overwrite an existing policy unless `--force` is supplied.
 ```
 
 `REPO_PROTOCOL_CHANGE_CLASS` is an explicit trust input. Set it from trusted
-workflow context, not pull-request content. Evidence can promote only its
-hash-bound files to the `generated` class.
+workflow context, not pull-request content. Do not set it to `generated`:
+evidence alone promotes only its hash-bound files to that derived class.
 
 ## Policy reference
 
