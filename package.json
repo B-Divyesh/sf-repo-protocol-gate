@@ -1,0 +1,28 @@
+{
+  "name": "repo-protocol-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic repository policy CLI and documentation",
+  "scripts": {
+    "dev": "vite --config site/vite.config.ts",
+    "build:cli": "cargo build --release --locked",
+    "build:site": "vite build --config site/vite.config.ts",
+    "build": "npm run build:cli && npm run build:site",
+    "test:cli": "cargo test --workspace --locked",
+    "test:site": "npm run build:site && node tests/site.mjs",
+    "test": "npm run test:cli && npm run test:site",
+    "check": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && tsc --noEmit -p site/tsconfig.json"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@fontsource-variable/newsreader": "5.2.8",
+    "@fontsource/ibm-plex-mono": "5.2.6",
+    "@types/node": "24.3.0",
+    "playwright": "1.58.2",
+    "typescript": "5.9.2",
+    "vite": "7.3.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

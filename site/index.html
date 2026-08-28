@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111025" />
+    <meta
+      name="description"
+      content="A deterministic CI gate for protected repository paths, generated files, metadata, and change relationships."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Repo Protocol Gate — make repository rules enforceable</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div id="network-status" class="network-status" role="status" hidden>
+      You’re offline. The local policy demo still works; install links may not.
+    </div>
+
+    <header class="site-header">
+      <a class="wordmark" href="#top" aria-label="Repo Protocol Gate home">
+        <span class="wordmark-mark" aria-hidden="true"><i></i></span>
+        <span>repo / protocol</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#protocol">Protocol</a>
+        <a href="#demo">Try it</a>
+        <a href="#install">Install</a>
+        <a class="nav-cta" href="https://github.com/B-Divyesh/sf-repo-protocol-gate">Source</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">01</span> Deterministic repository policy</p>
+          <h1 id="hero-title">Prompts suggest.<br /><em>Gates decide.</em></h1>
+          <p class="hero-lede">
+            Protect migrations, manifests, and project contracts with a compact,
+            versioned policy that says exactly why a change may—or may not—cross.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#install">Install the gate <span aria-hidden="true">↓</span></a>
+            <a class="button button-quiet" href="#demo">Test a change</a>
+          </div>
+          <ul class="proof-line" aria-label="Product guarantees">
+            <li>No LLM judge</li>
+            <li>No network calls</li>
+            <li>Exit codes for CI</li>
+          </ul>
+        </div>
+        <figure class="hero-scene">
+          <picture>
+            <source
+              type="image/webp"
+              srcset="/assets/protocol-gate-hero-640.webp 640w, /assets/protocol-gate-hero-960.webp 960w, /assets/protocol-gate-hero.webp 1280w"
+              sizes="(max-width: 760px) 100vw, 58vw"
+            />
+            <img
+              src="/assets/protocol-gate-hero.webp"
+              width="1280"
+              height="853"
+              fetchpriority="high"
+              alt="A vermilion checkpoint in a paper night landscape sorts code sheets onto an orderly golden path."
+            />
+          </picture>
+          <figcaption>
+            <span>Checkpoint 01</span>
+            Every verdict points back to a rule and line.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="protocol-section section" id="protocol" aria-labelledby="protocol-title">
+        <div class="section-index" aria-hidden="true">02 / The protocol</div>
+        <div class="section-intro">
+          <p class="eyebrow">Instructions are not enforcement</p>
+          <h2 id="protocol-title">Four checks. One inspectable contract.</h2>
+          <p>
+            Keep the context in AGENTS.md. Put the invariants in
+            <code>repo-protocol.yaml</code>, where agents, humans, and CI get the
+            same answer every time.
+          </p>
+        </div>
+        <ol class="rule-ledger">
+          <li>
+            <span class="rule-number">01</span>
+            <div><h3>Protected paths</h3><p>Assign explicit change classes to README files, lockfiles, deployment specs, or any Git glob.</p></div>
+            <code>paths</code>
+          </li>
+          <li>
+            <span class="rule-number">02</span>
+            <div><h3>Generator evidence</h3><p>Bind a generated artifact to its exact SHA-256 and an approved generator identity.</p></div>
+            <code>generators</code>
+          </li>
+          <li>
+            <span class="rule-number">03</span>
+            <div><h3>Required metadata</h3><p>Require a ticket, source path, or team-defined field before generated work can pass.</p></div>
+            <code>metadata</code>
+          </li>
+          <li>
+            <span class="rule-number">04</span>
+            <div><h3>Change relationships</h3><p>A migration can require its schema; an artifact can require its source in the same diff.</p></div>
+            <code>changed_any_of</code>
+          </li>
+        </ol>
+      </section>
+
+      <section class="demo-section section" id="demo" aria-labelledby="demo-title">
+        <div class="demo-heading">
+          <div class="section-index" aria-hidden="true">03 / Inspection desk</div>
+          <div>
+            <p class="eyebrow">Runs locally in this page</p>
+            <h2 id="demo-title">Put a proposed diff at the gate.</h2>
+            <p>Edit the paths or load a known case. Nothing leaves your browser.</p>
+          </div>
+        </div>
+
+        <div class="demo-shell">
+          <div class="policy-margin" aria-label="Demo policy summary">
+            <p class="margin-title">Policy v1</p>
+            <dl>
+              <div><dt>README.md</dt><dd>human only</dd></div>
+              <div><dt>db/migrations/**</dt><dd>drizzle-kit + evidence</dd></div>
+              <div><dt>relationship</dt><dd>db/schema/**</dd></div>
+            </dl>
+          </div>
+
+          <form id="gate-form" novalidate>
+            <fieldset class="presets">
+              <legend>Load an example</legend>
+              <button type="button" data-preset="readme">Blocked README</button>
+              <button type="button" data-preset="valid">Valid migration</button>
+              <button type="button" data-preset="orphan">Orphan migration</button>
+            </fieldset>
+
+            <div class="field field-wide">
+              <label for="changes">Proposed changes <span>one status and path per line</span></label>
+              <textarea id="changes" name="changes" rows="5" spellcheck="false" aria-describedby="change-help">M README.md</textarea>
+              <p id="change-help" class="field-help">Use A, M, or D. Example: <code>A db/migrations/0042_users.sql</code></p>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="change-class">Change class</label>
+                <select id="change-class" name="changeClass">
+                  <option value="agent">agent</option>
+                  <option value="human">human</option>
+                  <option value="generated">generated</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="generator">Generator</label>
+                <select id="generator" name="generator">
+                  <option value="">none</option>
+                  <option value="drizzle-kit">drizzle-kit</option>
+                  <option value="manual-script">manual-script</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ticket">Ticket metadata</label>
+                <input id="ticket" name="ticket" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="source">Source metadata</label>
+                <input id="source" name="source" autocomplete="off" />
+              </div>
+            </div>
+
+            <label class="check-field" for="hash-match">
+              <input id="hash-match" name="hashMatch" type="checkbox" />
+              <span>Artifact SHA-256 matches the evidence manifest</span>
+            </label>
+
+            <button class="button button-primary inspect-button" type="submit">
+              Inspect changes <span aria-hidden="true">→</span>
+            </button>
+          </form>
+
+          <section class="verdict" aria-labelledby="verdict-title">
+            <div class="verdict-topline">
+              <span class="verdict-seal" id="verdict-seal" aria-hidden="true">?</span>
+              <div>
+                <p class="eyebrow">Gate report</p>
+                <h3 id="verdict-title">Ready for inspection</h3>
+              </div>
+            </div>
+            <p id="verdict-summary">Choose a preset or edit the proposed changes, then inspect.</p>
+            <ol id="verdict-list" class="verdict-list" aria-live="polite"></ol>
+          </section>
+        </div>
+      </section>
+
+      <section class="install-section section" id="install" aria-labelledby="install-title">
+        <div class="section-index" aria-hidden="true">04 / Bring it home</div>
+        <div class="install-grid">
+          <div>
+            <p class="eyebrow">Free · MIT · one binary</p>
+            <h2 id="install-title">From zero to enforced in fifteen minutes.</h2>
+            <p>
+              Start with the template, name the paths your team cares about,
+              and add the same command to local hooks and CI.
+            </p>
+          </div>
+          <div class="command-block">
+            <div class="command-label"><span>Build from source</span><span>Rust stable</span></div>
+            <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-repo-protocol-gate repo-protocol</code></pre>
+            <button class="copy-button" id="copy-command" type="button">Copy command</button>
+            <p id="copy-status" class="sr-only" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="workflow" aria-label="Setup sequence">
+          <div><span>1</span><code>repo-protocol init</code><p>Write a starter policy.</p></div>
+          <div><span>2</span><code>repo-protocol validate</code><p>Catch schema and glob errors.</p></div>
+          <div><span>3</span><code>repo-protocol check --staged</code><p>Get a line-level verdict.</p></div>
+        </div>
+
+        <details class="reference">
+          <summary>Open the policy field reference</summary>
+          <div>
+            <p><code>paths</code> selects protected changes with Git-style globs. <code>allow.change_classes</code> names trusted workflow classes.</p>
+            <p><code>allow.generators</code> checks the generator in hash-bound evidence. <code>require.metadata</code> requires non-empty evidence values.</p>
+            <p><code>changed_any_of</code> and <code>changed_all_of</code> connect generated artifacts to source changes in the same diff.</p>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        <span class="footer-mark" aria-hidden="true"></span>
+        <strong>Repo Protocol Gate</strong>
+      </div>
+      <p>No accounts. No telemetry. No repository data leaves your machine.</p>
+      <nav aria-label="Footer navigation">
+        <a href="https://github.com/B-Divyesh/sf-repo-protocol-gate">GitHub</a>
+        <a href="https://github.com/B-Divyesh/sf-repo-protocol-gate/blob/main/LICENSE">MIT license</a>
+      </nav>
+    </footer>
+
+    <noscript><p class="noscript">The documentation works without JavaScript; enable it only to run the local demo.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
