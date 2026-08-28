@@ -30,9 +30,9 @@ version: 1
 default_change_class: agent
 
 rules:
-  - id: humans-own-readme
+  - id: humans-own-contracts
     description: Agents must not rewrite the project contract.
-    paths: [README.md]
+    paths: [README.md, repo-protocol.yaml]
     allow:
       change_classes: [human]
 
@@ -50,7 +50,7 @@ rules:
 override:
   minimum_reason_length: 12
   require_actor: true
-  audit_log: -
+  audit_log: "-"
 ```
 
 Validate the policy, then check a commit range:
