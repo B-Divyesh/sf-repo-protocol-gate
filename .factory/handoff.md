@@ -12,6 +12,11 @@ workflow or product deployment command. The push to `origin/main` succeeded;
 the remaining action is for the static deployment controller to publish the
 already-built `dist/site/` from implementation SHA `8d60b1f`.
 
+Fresh HTTPS browser contexts confirmed the same stale artifact at 1440×1000
+and 390×844: title `Repo Protocol Gate — make repository rules enforceable`,
+old H1 `Prompts suggest. Gates decide.`, and first action `Install the gate`.
+Both old-page checks had zero console errors; they do not verify this repair.
+
 ## Product job and audience
 
 Repo Protocol Gate gives engineering teams deterministic CI checks for coding
