@@ -1,0 +1,25 @@
+version: 1
+default_change_class: agent
+
+rules:
+  - id: humans-own-readme
+    description: Agents must not rewrite the project contract.
+    paths: [README.md]
+    allow:
+      change_classes: [human]
+
+  - id: generated-migrations
+    description: Migrations must come from the approved generator after a schema change.
+    paths: [db/migrations/**]
+    change_types: [added, modified]
+    allow:
+      change_classes: [generated]
+      generators: [drizzle-kit]
+    require:
+      metadata: [ticket, source]
+      changed_any_of: [db/schema/**]
+
+override:
+  minimum_reason_length: 12
+  require_actor: true
+  audit_log: "-"

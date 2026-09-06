@@ -115,6 +115,48 @@ a {
   display: none;
 }
 
+.demo-mode-banner {
+  position: sticky;
+  top: 0;
+  z-index: 24;
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px var(--gutter);
+  border-bottom: 1px solid var(--saffron);
+  background: var(--ink-900);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.demo-mode-banner[hidden] {
+  display: none;
+}
+
+.demo-mode-banner > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-mode-banner button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--paper);
+  background: transparent;
+  color: var(--paper);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.demo-mode-banner button:first-child {
+  border-color: var(--saffron);
+  color: var(--saffron);
+}
+
 .site-header {
   display: flex;
   align-items: center;
@@ -174,17 +216,11 @@ footer nav a {
   color: var(--mist);
   font-family: var(--mono);
   font-size: 0.78rem;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .site-header nav a:hover,
 footer nav a:hover {
-  color: var(--paper);
-}
-
-.site-header nav .nav-cta {
-  padding: 0 16px;
-  border: 1px solid var(--vermilion);
   color: var(--paper);
 }
 
@@ -262,6 +298,12 @@ h1 em {
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 40px;
+}
+
+.action-note {
+  flex-basis: 100%;
+  color: var(--mist);
+  font-size: 0.82rem;
 }
 
 .button {
@@ -877,6 +919,89 @@ select:hover {
   font-family: var(--mono);
 }
 
+.terminal-demo {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(300px, 1.2fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 56px;
+  padding: 28px 0;
+  border-top: 1px solid rgb(17 16 37 / 25%);
+  border-bottom: 1px solid rgb(17 16 37 / 25%);
+}
+
+.terminal-demo h3 {
+  margin-bottom: 10px;
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 550;
+}
+
+.terminal-demo p {
+  margin-bottom: 0;
+  color: #454239;
+}
+
+.terminal-demo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  border: 1px solid rgb(17 16 37 / 30%);
+}
+
+.terminal-demo pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: var(--ink-950);
+  color: var(--paper);
+  font: 0.76rem/1.6 var(--mono);
+}
+
+.legal-page {
+  max-width: 900px;
+  min-height: 62vh;
+  margin: 0 auto;
+  padding: clamp(72px, 11vw, 144px) var(--gutter);
+}
+
+.legal-page .eyebrow {
+  color: var(--saffron);
+}
+
+.legal-page h1 {
+  max-width: 14ch;
+  margin-bottom: 30px;
+  font-size: clamp(3rem, 7vw, 6.4rem);
+}
+
+.legal-page h2 {
+  margin-top: 52px;
+  margin-bottom: 14px;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.legal-page p,
+.legal-page li {
+  max-width: 68ch;
+  color: var(--mist);
+}
+
+.legal-page ul {
+  max-width: 64ch;
+  padding-left: 22px;
+}
+
+.not-found-link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  color: var(--saffron);
+  font-family: var(--mono);
+}
+
 footer {
   display: grid;
   grid-template-columns: 1fr 2fr auto;
@@ -906,6 +1031,14 @@ footer > div {
 footer p {
   margin: 0;
   text-align: center;
+}
+
+.factory-credit {
+  grid-column: 1 / -1;
+  color: var(--mist);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-align: left;
 }
 
 .sr-only {
@@ -979,12 +1112,9 @@ footer p {
     min-height: 72px;
   }
 
-  .site-header nav a:not(.nav-cta) {
+  .site-header nav a:nth-child(2),
+  .site-header nav a:nth-child(3) {
     display: none;
-  }
-
-  .site-header nav .nav-cta {
-    padding: 0 12px;
   }
 
   .hero {
@@ -1095,6 +1225,15 @@ footer p {
     grid-template-columns: 1fr;
   }
 
+  .terminal-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-demo img {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .workflow {
     grid-template-columns: 1fr;
   }
@@ -1122,6 +1261,10 @@ footer p {
 
   footer p {
     max-width: 48ch;
+    text-align: left;
+  }
+
+  .factory-credit {
     text-align: left;
   }
 }
@@ -1154,6 +1297,11 @@ footer p {
 
   .presets button {
     width: 100%;
+  }
+
+  .demo-mode-banner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

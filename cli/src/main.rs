@@ -1,5 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
+use std::process::Command as ProcessCommand;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -22,6 +23,8 @@ enum Command {
     Validate(ValidateArgs),
     /// Write a commented starter policy
     Init(InitArgs),
+    /// Run the bundled policy sample in a temporary Git repository
+    Demo,
 }
 
 #[derive(Debug, Args)]
@@ -106,6 +109,7 @@ fn main() {
         }),
         Command::Validate(args) => repo_protocol::run_validate(&args.config, args.json),
         Command::Init(args) => repo_protocol::run_init(&args.config, args.force),
+        Command::Demo => run_demo(),
     };
 
     if let Err(error) = code {
@@ -118,5 +122,33 @@ fn main() {
             eprintln!("repo-protocol: {error}");
         }
         std::process::exit(2);
+    }
+}
+
+fn run_demo() -> Result<(), repo_protocol::AppError> {
+    let root = repo_protocol::prepare_demo_repository()?;
+    println!("Demo repository: {}", root.display());
+    println!("Sample: a hash-bound Drizzle migration with its schema change.");
+
+    let executable = std::env::current_exe().map_err(|error| {
+        repo_protocol::AppError(format!("could not find this executable: {error}"))
+    })?;
+    let status = ProcessCommand::new(executable)
+        .args(["check", "--staged"])
+        .current_dir(&root)
+        .status()
+        .map_err(|error| {
+            repo_protocol::AppError(format!("could not run the bundled sample: {error}"))
+        })?;
+    if status.success() {
+        println!(
+            "Sample result: allowed. The repository remains at the path above for inspection."
+        );
+        Ok(())
+    } else {
+        Err(repo_protocol::AppError(format!(
+            "the bundled sample check exited with {}",
+            status.code().unwrap_or(2)
+        )))
     }
 }

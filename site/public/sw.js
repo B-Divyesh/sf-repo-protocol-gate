@@ -1,5 +1,12 @@
-const CACHE = "repo-protocol-gate-v1";
-const SHELL = ["/", "/index.html", "/assets/protocol-gate-hero-640.webp"];
+const CACHE = "repo-protocol-gate-v2";
+const SHELL = [
+  "/",
+  "/index.html",
+  "/demo",
+  "/privacy",
+  "/terms",
+  "/assets/protocol-gate-hero-640.webp",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

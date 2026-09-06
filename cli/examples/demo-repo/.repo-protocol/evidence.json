@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "generator": "drizzle-kit",
+  "metadata": {
+    "ticket": "ENG-204",
+    "source": "db/schema/users.ts"
+  },
+  "changes": [
+    {
+      "path": "db/migrations/0042_users.sql",
+      "sha256": "33a6ca32b020154b2419791659ee0bad4bf96cec767f4e44b9b243b3a68cc587"
+    }
+  ]
+}

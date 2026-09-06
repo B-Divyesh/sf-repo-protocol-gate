@@ -1,0 +1,128 @@
+[
+  {
+    "id": "deterministic-versioned-decisions",
+    "claim": "Uses versioned policy rules to make deterministic decisions without an LLM judge.",
+    "where": "README, landing page metadata",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:deterministic-versioned-decisions' tests/claims.mjs",
+    "sandbox": "temporary Git repository with the documented protected README policy"
+  },
+  {
+    "id": "protected-change-classes",
+    "claim": "Rules can restrict protected paths to an allowed change class.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:protected-change-classes' tests/claims.mjs",
+    "sandbox": "temporary Git repository with an agent-authored README change"
+  },
+  {
+    "id": "hash-bound-generated-artifacts",
+    "claim": "Generated artifacts require evidence bound to their exact SHA-256 content.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:hash-bound-generated-artifacts' tests/claims.mjs",
+    "sandbox": "temporary Git repository with edited and missing evidence entries"
+  },
+  {
+    "id": "generator-metadata-relationships",
+    "claim": "Generated migrations require an approved generator, required metadata, and a companion schema change.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:generator-metadata-relationships' tests/claims.mjs",
+    "sandbox": "temporary Git repository with invalid generator, missing metadata, and missing schema companion"
+  },
+  {
+    "id": "line-level-denials",
+    "claim": "A denial names the matching rule and configuration line.",
+    "where": "landing page",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:line-level-denials' tests/claims.mjs",
+    "sandbox": "temporary Git repository with a denied README change"
+  },
+  {
+    "id": "json-and-exit-codes",
+    "claim": "JSON reports stay machine-readable and use exit codes 0, 1, and 2 for allow, denial, and input errors.",
+    "where": "README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:json-and-exit-codes' tests/claims.mjs",
+    "sandbox": "temporary Git repositories covering automatic ranges and invalid policy input"
+  },
+  {
+    "id": "audited-overrides",
+    "claim": "An explicit emergency override keeps denials in the report and writes an audit record.",
+    "where": "README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:audited-overrides' tests/claims.mjs",
+    "sandbox": "temporary Git repository with a denied README change and an accountable override"
+  },
+  {
+    "id": "init-preserves-policy",
+    "claim": "Init refuses to replace an existing policy until --force is supplied.",
+    "where": "README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:init-preserves-policy' tests/claims.mjs",
+    "sandbox": "temporary directory with a starter policy"
+  },
+  {
+    "id": "bundled-cli-demo",
+    "claim": "repo-protocol demo creates a temporary sample repository and checks an approved migration.",
+    "where": "landing page, README, cli README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:bundled-cli-demo' tests/claims.mjs",
+    "sandbox": "the bundled sample repository created by the CLI in a temporary directory"
+  },
+  {
+    "id": "one-binary-cli",
+    "claim": "Repo Protocol Gate is a single CLI binary.",
+    "where": "landing page, cli README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:one-binary-cli' tests/claims.mjs",
+    "sandbox": "release binary --help output"
+  },
+  {
+    "id": "local-no-network-cli",
+    "claim": "The CLI makes its decisions locally and does not require an account or network service.",
+    "where": "README, privacy page",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:local-no-network-cli' tests/claims.mjs",
+    "sandbox": "bundled CLI demo with all HTTP proxy variables pointed at an unavailable local address"
+  },
+  {
+    "id": "free-mit-license",
+    "claim": "Repo Protocol Gate is free software under the MIT License.",
+    "where": "landing page, terms page, README",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:free-mit-license' tests/claims.mjs",
+    "sandbox": "Cargo package metadata and the shipped license file"
+  },
+  {
+    "id": "no-account-required",
+    "claim": "The sample runs without an account.",
+    "where": "landing page",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:no-account-required' tests/claims.mjs",
+    "sandbox": "fresh browser context opened directly at /demo"
+  },
+  {
+    "id": "browser-demo-local",
+    "claim": "The browser sample does not send form data away.",
+    "where": "landing page",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:browser-demo-local' tests/claims.mjs",
+    "sandbox": "fresh browser context recording every request and browser-storage key during /demo"
+  },
+  {
+    "id": "demo-reset-and-discard",
+    "claim": "Demo data is labelled as sample data, can be reset, and is discarded when starting for real.",
+    "where": "demo banner",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:demo-reset-and-discard' tests/claims.mjs",
+    "sandbox": "fresh browser context using the reset and Start for real controls"
+  },
+  {
+    "id": "offline-demo",
+    "claim": "The local sample still works offline after the first visit.",
+    "where": "offline status message",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:offline-demo' tests/claims.mjs",
+    "sandbox": "fresh browser context, service worker ready, then offline reload of /demo"
+  },
+  {
+    "id": "documentation-without-javascript",
+    "claim": "The documentation is usable without JavaScript; JavaScript is needed only for the local sample form.",
+    "where": "noscript message",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:documentation-without-javascript' tests/claims.mjs",
+    "sandbox": "fresh browser context with JavaScript disabled"
+  },
+  {
+    "id": "routes-and-legal-pages",
+    "claim": "The demo, privacy, terms, and missing-page routes have their own titles and content.",
+    "where": "site navigation, sitemap",
+    "test": "npm run test:claim -- --test-name-pattern='@claim:routes-and-legal-pages' tests/claims.mjs",
+    "sandbox": "fresh browser context visiting each public route directly"
+  }
+]

@@ -5,9 +5,8 @@ run before an agent-authored change can merge. It protects paths, verifies
 hash-bound generator evidence, requires metadata, and enforces companion
 changes without an LLM in the decision path.
 
-It is for engineering teams that let coding agents modify application
-repositories and need rules such as “humans own the README” and “migrations
-must come from Drizzle after the schema changes” to hold in CI.
+It is for teams that let coding agents change application repositories.
+Use it when humans own the README or migrations need an approved schema change.
 
 ## Install
 
@@ -18,8 +17,17 @@ cargo install --path cli
 repo-protocol --help
 ```
 
-The crate starts at `0.1.0`. It has no telemetry, network calls, daemon, or
-runtime service.
+The crate is version `0.1.0`.
+It has no telemetry, network calls, daemon, or runtime service.
+
+Try the bundled repository sample in one command:
+
+```sh
+repo-protocol demo
+```
+
+It creates a temporary Git repository, checks an approved migration, and
+prints the folder path for inspection.
 
 ## Usage
 
@@ -70,10 +78,11 @@ Generated changes carry evidence in `.repo-protocol/evidence.json`. Each
 listed artifact is bound to its exact content; editing it after generation
 invalidates the evidence.
 
-The evidence document is a trust boundary. For adversarial CI, have a trusted
-generator wrapper write it outside the checkout and pass that absolute path
-with `--evidence`; do not let untrusted pull-request steps write the evidence
-artifact. The repository-relative default is convenient for local workflows.
+The evidence document is a trust boundary.
+For adversarial CI, use a trusted generator wrapper outside the checkout.
+Pass its absolute path with `--evidence`.
+Do not let untrusted pull-request steps write the evidence artifact.
+The repository-relative default suits local workflows.
 
 ```json
 {
@@ -151,7 +160,7 @@ evidence alone promotes only its hash-bound files to that derived class.
 Requirements: Rust stable and Node.js 20+.
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
 ```
@@ -166,13 +175,20 @@ cargo package --manifest-path cli/Cargo.toml
 Run the docs locally with `npm run dev`. The live documentation is at
 https://repo-protocol-gate.sociobot.in.
 
+Open https://repo-protocol-gate.sociobot.in/demo for the browser sample.
+It starts with an approved migration and keeps its data in the demo namespace.
+Use Reset demo to restore the sample. Use Start for real to discard it.
+
+The site also provides /privacy and /terms pages.
+
 ## Privacy and security
 
-Repo Protocol Gate runs locally, reads only the configured Git diff and policy
-evidence, and sends nothing over the network. The documentation demo runs
-entirely in the browser and stores nothing. Treat change class flags and
-override actor values as trusted CI inputs. Treat the generator evidence path
-the same way when provenance must resist a malicious contributor.
+Repo Protocol Gate reads the configured Git diff and policy evidence locally.
+It sends no repository data over the network.
+The browser demo runs locally and uses only a `demo:` browser-session key.
+Start for real removes that key.
+Treat change classes and override actors as trusted CI inputs.
+Treat the generator evidence path the same way for adversarial repositories.
 
 ## License
 

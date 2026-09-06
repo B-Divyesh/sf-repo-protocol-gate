@@ -10,7 +10,9 @@
     "build": "npm run build:cli && npm run build:site",
     "test:cli": "cargo test --workspace --locked",
     "test:site": "npm run build:site && node tests/site.mjs",
-    "test": "npm run test:cli && npm run test:site",
+    "test:claim": "npm run build && node --test",
+    "test:claims": "npm run test:claim -- tests/claims.mjs",
+    "test": "npm run test:cli && npm run test:site && npm run test:claims",
     "check": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && tsc --noEmit -p site/tsconfig.json"
   },
   "devDependencies": {

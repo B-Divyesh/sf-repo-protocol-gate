@@ -6,16 +6,21 @@
     <meta name="theme-color" content="#111025" />
     <meta
       name="description"
-      content="A deterministic CI gate for protected repository paths, generated files, metadata, and change relationships."
+      content="Check protected repository changes in CI with versioned rules, generated-file evidence, metadata, and companion changes."
     />
     <link rel="canonical" href="https://repo-protocol-gate.sociobot.in/" />
-    <meta property="og:title" content="Repo Protocol Gate" />
-    <meta property="og:description" content="Make repository rules enforceable with a deterministic local and CI gate." />
+    <meta property="og:title" content="Repo Protocol Gate — enforce repository rules" />
+    <meta property="og:description" content="Check protected repository changes in CI with versioned rules and clear denials." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://repo-protocol-gate.sociobot.in/" />
-    <meta property="og:image" content="https://repo-protocol-gate.sociobot.in/assets/protocol-gate-hero.webp" />
+    <meta property="og:image" content="https://repo-protocol-gate.sociobot.in/assets/sf-repo-protocol-gate-share.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Repo Protocol Gate — enforce repository rules" />
+    <meta name="twitter:description" content="Check protected repository changes in CI with versioned rules and clear denials." />
+    <meta name="twitter:image" content="https://repo-protocol-gate.sociobot.in/assets/sf-repo-protocol-gate-share.webp" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>Repo Protocol Gate — make repository rules enforceable</title>
+    <link rel="apple-touch-icon" href="/assets/sf-repo-protocol-gate-apple-touch.png" />
+    <title>Repo Protocol Gate — enforce repository rules</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
@@ -24,35 +29,46 @@
     </div>
 
     <header class="site-header">
-      <a class="wordmark" href="#top" aria-label="Repo Protocol Gate home">
+      <a class="wordmark" href="/" aria-label="Repo Protocol Gate home">
         <span class="wordmark-mark" aria-hidden="true"><i></i></span>
         <span>repo / protocol</span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#protocol">Protocol</a>
-        <a href="#demo">Try it</a>
+        <a href="/demo">Demo</a>
+        <a href="#checks">What it checks</a>
         <a href="#install">Install</a>
-        <a class="nav-cta" href="https://github.com/B-Divyesh/sf-repo-protocol-gate">Source</a>
+        <a href="/privacy">Privacy</a>
       </nav>
     </header>
 
-    <main id="main">
+    <div id="route-announcer" class="sr-only" aria-live="polite"></div>
+    <aside id="demo-mode-banner" class="demo-mode-banner" aria-label="Demo controls" hidden>
+      <span>Demo — sample data, nothing is saved</span>
+      <div>
+        <button type="button" id="reset-demo">Reset demo</button>
+        <button type="button" id="start-real">Start for real</button>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <div id="landing-content">
       <section class="hero" id="top" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow"><span aria-hidden="true">01</span> Deterministic repository policy</p>
-          <h1 id="hero-title">Prompts suggest.<br /><em>Gates decide.</em></h1>
+          <div id="hero-title-slot"><h1 id="hero-title" tabindex="-1">Enforce repository rules in CI</h1></div>
           <p class="hero-lede">
-            Protect migrations, manifests, and project contracts with a compact,
-            versioned policy that says exactly why a change may—or may not—cross.
+            For engineering teams letting coding agents change repositories. Block
+            protected changes that do not meet your versioned rules.
           </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#install">Install the gate <span aria-hidden="true">↓</span></a>
-            <a class="button button-quiet" href="#demo">Test a change</a>
+            <a class="button button-primary" href="/demo">Try it with sample data <span aria-hidden="true">→</span></a>
+            <span class="action-note">Loads an approved migration and its policy.</span>
+            <a class="button button-quiet" href="#install">Install the CLI</a>
           </div>
           <ul class="proof-line" aria-label="Product guarantees">
-            <li>No LLM judge</li>
-            <li>No network calls</li>
-            <li>Exit codes for CI</li>
+            <li>Free and MIT licensed</li>
+            <li>Runs locally in CI</li>
+            <li>No account required</li>
           </ul>
         </div>
         <figure class="hero-scene">
@@ -71,21 +87,20 @@
             />
           </picture>
           <figcaption>
-            <span>Checkpoint 01</span>
-            Every verdict points back to a rule and line.
+            <span>Sample policy</span>
+            Each denial names its rule and configuration line.
           </figcaption>
         </figure>
       </section>
 
-      <section class="protocol-section section" id="protocol" aria-labelledby="protocol-title">
-        <div class="section-index" aria-hidden="true">02 / The protocol</div>
+      <section class="protocol-section section" id="checks" aria-labelledby="protocol-title">
+        <div class="section-index" aria-hidden="true">02 / Checks</div>
         <div class="section-intro">
-          <p class="eyebrow">Instructions are not enforcement</p>
-          <h2 id="protocol-title">Four checks. One inspectable contract.</h2>
+          <p class="eyebrow">Versioned rules for local checks and CI</p>
+          <h2 id="protocol-title">Check repository rules before merge</h2>
           <p>
-            Keep the context in AGENTS.md. Put the invariants in
-            <code>repo-protocol.yaml</code>, where agents, humans, and CI get the
-            same answer every time.
+            Put rules in <code>repo-protocol.yaml</code>. Agents, humans, and CI
+            receive the same result for the same repository change.
           </p>
         </div>
         <ol class="rule-ledger">
@@ -114,11 +129,11 @@
 
       <section class="demo-section section" id="demo" aria-labelledby="demo-title">
         <div class="demo-heading">
-          <div class="section-index" aria-hidden="true">03 / Inspection desk</div>
+          <div class="section-index" aria-hidden="true">03 / Sample check</div>
           <div>
             <p class="eyebrow">Runs locally in this page</p>
-            <h2 id="demo-title">Put a proposed diff at the gate.</h2>
-            <p>Edit the paths or load a known case. Nothing leaves your browser.</p>
+            <h2 id="demo-title">Check a sample repository change</h2>
+            <p>Load a sample or edit the paths. The browser does not send this form anywhere.</p>
           </div>
         </div>
 
@@ -198,14 +213,14 @@
       </section>
 
       <section class="install-section section" id="install" aria-labelledby="install-title">
-        <div class="section-index" aria-hidden="true">04 / Bring it home</div>
+        <div class="section-index" aria-hidden="true">04 / Install</div>
         <div class="install-grid">
           <div>
             <p class="eyebrow">Free · MIT · one binary</p>
-            <h2 id="install-title">From zero to enforced in fifteen minutes.</h2>
+            <h2 id="install-title">Add repository checks to CI</h2>
             <p>
-              Start with the template, name the paths your team cares about,
-              and add the same command to local hooks and CI.
+              Start with the template. Name protected paths. Run the same command
+              in a local hook and CI.
             </p>
           </div>
           <div class="command-block">
@@ -222,6 +237,19 @@
           <div><span>3</span><code>repo-protocol check --staged</code><p>Get a line-level verdict.</p></div>
         </div>
 
+        <div class="terminal-demo" aria-labelledby="terminal-demo-title">
+          <div>
+            <p class="eyebrow">Bundled CLI sample</p>
+            <h3 id="terminal-demo-title">Run the sample from the installed binary</h3>
+            <p><code>repo-protocol demo</code> creates a temporary repository and checks an approved migration.</p>
+          </div>
+          <img src="/assets/sf-repo-protocol-gate-terminal.svg" width="720" height="288" alt="" aria-hidden="true" />
+          <pre tabindex="0" aria-label="CLI demo transcript"><code>$ repo-protocol demo
+Demo repository: /tmp/repo-protocol-demo-…
+ALLOW — 1 protected change satisfied every rule.
+Sample result: allowed.</code></pre>
+        </div>
+
         <details class="reference">
           <summary>Open the policy field reference</summary>
           <div>
@@ -231,6 +259,8 @@
           </div>
         </details>
       </section>
+      </div>
+      <section id="route-content" hidden></section>
     </main>
 
     <footer>
@@ -238,11 +268,14 @@
         <span class="footer-mark" aria-hidden="true"></span>
         <strong>Repo Protocol Gate</strong>
       </div>
-      <p>No accounts. No telemetry. No repository data leaves your machine.</p>
+      <p>Local checks for teams that need repository rules enforced in CI.</p>
       <nav aria-label="Footer navigation">
         <a href="https://github.com/B-Divyesh/sf-repo-protocol-gate">GitHub</a>
         <a href="https://github.com/B-Divyesh/sf-repo-protocol-gate/blob/main/LICENSE">MIT license</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
       </nav>
+      <p class="factory-credit">Built by Param Factory · v0.1.0</p>
     </footer>
 
     <noscript><p class="noscript">The documentation works without JavaScript; enable it only to run the local demo.</p></noscript>

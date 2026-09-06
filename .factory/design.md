@@ -107,5 +107,19 @@ depth remains through scale, overlap, texture, and borders.
 - Alt intent: “A vermilion checkpoint in a paper night landscape sorts code
   sheets onto an orderly golden path.”
 
+### Share, app-icon, and demo assets
+
+- `site/public/assets/sf-repo-protocol-gate-share.webp` is a 1200×630 crop of
+  the original generated hero. It preserves the checkpoint, paper, and ink
+  palette for Open Graph and Twitter cards. It was derived locally on
+  2026-09-06; no third-party image was added.
+- `site/public/assets/sf-repo-protocol-gate-apple-touch.png` is an original
+  raster rendering of the product's two-arch CSS mark in ink, vermilion, and
+  saffron. It was made locally on 2026-09-06 for the 180px Apple touch icon.
+- `site/public/assets/sf-repo-protocol-gate-terminal.svg` is a hand-made
+  presentation of the real `repo-protocol demo` output. The identical,
+  selectable text transcript sits beside it so no information depends on text
+  in an image.
+
 All other graphic marks are original CSS geometry or typographic characters;
 there are no stock assets or third-party icon sets.

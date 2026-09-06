@@ -9,6 +9,7 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 readme = "README.md"
+include = ["Cargo.toml", "README.md", "src/**", "examples/demo-repo/**"]
 
 [[bin]]
 name = "repo-protocol"

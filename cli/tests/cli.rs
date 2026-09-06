@@ -304,3 +304,70 @@ fn json_mode_keeps_configuration_errors_machine_readable() {
 
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn bundled_demo_runs_the_installed_binary_on_a_real_sample_repository() {
+    let output = Command::new(env!("CARGO_BIN_EXE_repo-protocol"))
+        .arg("demo")
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("ALLOW — 1 protected change satisfied every rule."));
+    assert!(stdout.contains("Sample result: allowed."));
+    let root = stdout
+        .lines()
+        .find_map(|line| line.strip_prefix("Demo repository: "))
+        .map(PathBuf::from)
+        .expect("demo should print its repository path");
+    assert!(root.join(".repo-protocol/evidence.json").is_file());
+
+    let repeat = gate(&root, &["check", "--staged", "--json"]);
+    assert!(repeat.status.success());
+    let report: serde_json::Value = serde_json::from_slice(&repeat.stdout).unwrap();
+    assert_eq!(report["status"], "allowed");
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn init_preserves_an_existing_policy_until_force_is_explicit() {
+    let root = std::env::temp_dir().join(format!(
+        "repo-protocol-init-{}-{}",
+        std::process::id(),
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    let config = root.join("repo-protocol.yaml");
+
+    let first = Command::new(env!("CARGO_BIN_EXE_repo-protocol"))
+        .args(["init", "--config"])
+        .arg(&config)
+        .output()
+        .unwrap();
+    assert!(first.status.success());
+    let original = fs::read_to_string(&config).unwrap();
+
+    let repeated = Command::new(env!("CARGO_BIN_EXE_repo-protocol"))
+        .args(["init", "--config"])
+        .arg(&config)
+        .output()
+        .unwrap();
+    assert_eq!(repeated.status.code(), Some(2));
+    assert_eq!(fs::read_to_string(&config).unwrap(), original);
+
+    let forced = Command::new(env!("CARGO_BIN_EXE_repo-protocol"))
+        .args(["init", "--force", "--config"])
+        .arg(&config)
+        .output()
+        .unwrap();
+    assert!(forced.status.success());
+    assert_eq!(fs::read_to_string(&config).unwrap(), original);
+    fs::remove_dir_all(root).unwrap();
+}

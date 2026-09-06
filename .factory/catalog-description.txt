@@ -1,0 +1,1 @@
+Enforce repository rules in CI with deterministic checks for protected paths and generated files.

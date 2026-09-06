@@ -45,7 +45,7 @@ override:
 "#;
 
 #[derive(Debug)]
-pub struct AppError(String);
+pub struct AppError(pub String);
 
 impl Display for AppError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
@@ -241,6 +241,72 @@ pub fn run_init(path: &Path, force: bool) -> AppResult<()> {
     println!("Created {}", path.display());
     println!("Next: review the trust classes, then run `repo-protocol validate`.");
     Ok(())
+}
+
+/// Create the documented demonstration repository in a new temporary folder.
+/// The CLI entry point then invokes the same `check --staged` command a CI job
+/// would use, so the sample is an end-to-end binary exercise rather than a
+/// separate simulation.
+pub fn prepare_demo_repository() -> AppResult<PathBuf> {
+    const POLICY: &str = include_str!("../examples/demo-repo/repo-protocol.yaml");
+    const README: &str = include_str!("../examples/demo-repo/README.md");
+    const SCHEMA: &str = include_str!("../examples/demo-repo/db/schema/users.ts");
+    const MIGRATION: &str = include_str!("../examples/demo-repo/db/migrations/0042_users.sql");
+    const EVIDENCE: &str = include_str!("../examples/demo-repo/.repo-protocol/evidence.json");
+
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|_| AppError("system clock is before the Unix epoch".into()))?
+        .as_nanos();
+    let root =
+        std::env::temp_dir().join(format!("repo-protocol-demo-{}-{nonce}", std::process::id()));
+    fs::create_dir_all(&root).map_err(|error| io_error("create", &root, error))?;
+    for (relative, contents) in [("repo-protocol.yaml", POLICY), ("README.md", README)] {
+        let path = root.join(relative);
+        fs::write(&path, contents).map_err(|error| io_error("write", &path, error))?;
+    }
+    for args in [
+        ["init", "-q"].as_slice(),
+        ["config", "user.email", "demo@example.invalid"].as_slice(),
+        ["config", "user.name", "Repo Protocol Demo"].as_slice(),
+        ["add", "."].as_slice(),
+        ["commit", "-qm", "sample baseline"].as_slice(),
+    ] {
+        let status = Command::new("git")
+            .args(args)
+            .current_dir(&root)
+            .status()
+            .map_err(|error| AppError(format!("could not run git for the demo: {error}")))?;
+        if !status.success() {
+            return Err(AppError(
+                "could not prepare the bundled demo repository".into(),
+            ));
+        }
+    }
+    fs::create_dir_all(root.join("db/schema")).map_err(|error| io_error("create", &root, error))?;
+    fs::create_dir_all(root.join("db/migrations"))
+        .map_err(|error| io_error("create", &root, error))?;
+    fs::create_dir_all(root.join(".repo-protocol"))
+        .map_err(|error| io_error("create", &root, error))?;
+    for (relative, contents) in [
+        ("db/schema/users.ts", SCHEMA),
+        ("db/migrations/0042_users.sql", MIGRATION),
+        (".repo-protocol/evidence.json", EVIDENCE),
+    ] {
+        let path = root.join(relative);
+        fs::write(&path, contents).map_err(|error| io_error("write", &path, error))?;
+    }
+    let status = Command::new("git")
+        .args(["add", "."])
+        .current_dir(&root)
+        .status()
+        .map_err(|error| AppError(format!("could not run git for the demo: {error}")))?;
+    if !status.success() {
+        return Err(AppError(
+            "could not stage the bundled demo repository".into(),
+        ));
+    }
+    Ok(root)
 }
 
 pub fn run_validate(path: &Path, json: bool) -> AppResult<()> {

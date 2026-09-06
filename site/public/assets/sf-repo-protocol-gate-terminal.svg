@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="288" viewBox="0 0 720 288" role="img" aria-labelledby="title desc">
+  <title id="title">Repo Protocol Gate CLI sample</title>
+  <desc id="desc">A terminal shows the bundled repository sample passing one protected migration check.</desc>
+  <rect width="720" height="288" fill="#191832"/>
+  <rect x="1" y="1" width="718" height="286" fill="none" stroke="#F3E8CE" stroke-opacity=".28"/>
+  <circle cx="28" cy="26" r="7" fill="#F36A4A"/><circle cx="52" cy="26" r="7" fill="#F4B942"/><circle cx="76" cy="26" r="7" fill="#A8C9B8"/>
+  <path d="M1 52h718" stroke="#F3E8CE" stroke-opacity=".28"/>
+  <g font-family="monospace" font-size="17">
+    <text x="28" y="91" fill="#F4B942">$ repo-protocol demo</text>
+    <text x="28" y="132" fill="#C9C3B6">Demo repository: /tmp/repo-protocol-demo-…</text>
+    <text x="28" y="173" fill="#A8C9B8">ALLOW — 1 protected change satisfied every rule.</text>
+    <text x="28" y="214" fill="#F3E8CE">Sample result: allowed.</text>
+  </g>
+  <rect x="28" y="238" width="12" height="22" fill="#F36A4A"/>
+</svg>

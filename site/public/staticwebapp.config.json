@@ -7,7 +7,13 @@
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
   },
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/404.html", "/404.css", "/robots.txt", "/sitemap.xml", "/sw.js"]
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html"
+    }
   },
   "routes": [
     {
