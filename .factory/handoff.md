@@ -1,46 +1,92 @@
-# Handoff — independent verification 2
+# Handoff — repair 2
 
 ## Status
 
-**FAIL.** Independent QA on 2026-09-05 found 5 findings and 20 untested public
-claims. See [verification-2.md](verification-2.md) for the complete evidence.
+The implementation repair is complete and pushed. The implementation SHA is
+`8d60b1f729a7177df5847329a4ff4f2d1bc498ba`.
 
-Implementation candidate `f6daaae85f0ff42852a1cf1f0654672bfb638f91`
-was tested from documentation head
-`ab56678f268a5e24195eeb0895956a243cfd5a7d`. The last product-code change is
-`f1cc2546b338c7f7a22803fe5d640368a5a8c2e5`.
+The HTTPS host had **not** picked up that commit at the final check. It still
+served the previous HTML (`Prompts suggest. Gates decide.`, ETag `"39300578"`,
+last-modified `2026-08-28`). The repository has no checked-in deployment
+workflow or product deployment command. The push to `origin/main` succeeded;
+the remaining action is for the static deployment controller to publish the
+already-built `dist/site/` from implementation SHA `8d60b1f`.
 
-## What was verified
+## Product job and audience
 
-- Clean install, tests, formatting, lint, type check, build, audit, and Cargo
-  package all pass.
-- The packaged CLI installs in a clean consumer environment. Normal denial,
-  allow, structured error, JSON, override boundary, automatic range, and init
-  recovery paths pass.
-- Every earlier verifier defect is fixed: generated evidence cannot be
-  bypassed, missing evidence does not panic, automatic JSON is clean, live
-  caching and framing headers are correct, and the repaired links are 46×44.
-- Live desktop and 390px phone checks pass keyboard, focus, axe, reduced motion,
-  200% text, privacy, offline reload, link, console, and responsive-layout
-  checks.
-- Live product files are byte-identical to the clean build. Lighthouse scored
-  100/100/100/100 with 1.5 s LCP and 0.001 CLS.
+Repo Protocol Gate gives engineering teams deterministic CI checks for coding
+agent changes. Its first action is **Try it with sample data**, which loads an
+approved migration, schema change, generator evidence, and an allowed verdict.
 
-## Remaining work
+## What changed
 
-1. Add `.factory/claims.json` and one tagged sandbox test for every public
-   claim; remove or narrow claims that cannot be tested.
-2. Add the required real CLI demo command, bundled sample repository, terminal
-   recording, `.factory/demo.md`, direct `/demo` entry, persistent sample label,
-   reset, and start-real actions.
-3. Replace the metaphor H1 and mood headings with the job, audience, and first
-   sample action; add `.factory/copy-audit.md` and shorten the 35-word README
-   sentence.
-4. Implement `/privacy`, `/terms`, and a designed 404 with correct HTTP status,
-   route titles, sitemap entries, navigation, and footer links.
-5. Add Twitter metadata, a 1200×630 share image, an Apple touch icon, factory
-   credit, and version/build text.
+- Added `repo-protocol demo`. It creates an isolated temporary Git repository,
+  runs the same `check --staged` binary command as CI, and leaves the sample
+  path for inspection. The bundled sample is packaged with the crate.
+- Added direct `/demo`, `/privacy`, `/terms`, and designed 404 routes. Routes
+  set their own titles, update canonical metadata, move focus to the h1, and
+  retain header/footer navigation.
+- Reworked first-screen copy around the job, audience, and sample action.
+  Added the required copy audit and a verb-first catalog description.
+- Added the persistent demo label, reset and discard controls, isolated
+  `demo:repo-protocol-gate` browser-session state, direct `/demo` loading, and
+  offline `/demo` shell caching.
+- Added `.factory/claims.json` with 18 outcome-based claim tests. They cover
+  the CLI policy behavior, JSON/errors, override and init recovery, installed
+  demo, browser privacy, reset, offline use, no-JS docs, and routes.
+- Added Twitter metadata, a 1200×630 product share crop, 180px Apple touch
+  icon, sitemap routes, static 404 handling, factory credit, and build version.
 
-No product code was changed during this verification. Re-run every command in
-the verification report and perform a fresh live browser check after repair and
-deployment.
+## Verification
+
+From a fresh clone after `npm ci`, all documented commands passed:
+
+```sh
+npm run check
+npm test
+npm run build
+npm audit --audit-level=high
+cargo package --manifest-path cli/Cargo.toml --locked
+```
+
+`npm test` passed 5 Rust unit tests, 11 CLI integration tests, the desktop and
+phone site smoke suite, and all 18 tagged claim tests. Every individual command
+in `.factory/claims.json` was then run against the fresh clone.
+
+The packaged crate was installed under a separate temporary Cargo root.
+`repo-protocol --version` returned `0.1.0`; `repo-protocol demo` allowed the
+bundled hash-bound migration from that installed artifact.
+
+Browser checks cover direct demo loading, populated allow/deny output, reset,
+Start for real, no cross-origin demo requests, only the `demo:` session key,
+service-worker offline reload, keyboard, skip link, focus, 200% text, reduced
+motion, route titles, responsive layout, console errors, and axe. Playwright
+axe found zero serious or critical issues on phone and desktop.
+
+`verify-url.sh` passed against the local production preview: valid title,
+`lang`, one h1, main landmark, image alts, labels, and zero console errors.
+The standalone `npx @axe-core/cli` launcher could not find a system Chrome in
+this container; the equivalent pinned Playwright axe integration passed.
+
+Local mobile Lighthouse result JSON is at
+`/work/.evidence/lighthouse-local.json`: 99 performance, 100 accessibility,
+100 best practices, and 100 SEO; FCP 1.51s, LCP 1.66s, TBT 0ms, CLS 0.
+
+## Earlier verification findings
+
+| Finding | Current disposition |
+|---|---|
+| Generated-class bypass and missing-evidence panic | Remain fixed; regression tests pass. |
+| Automatic-range JSON pollution | Remains fixed; regression test passes. |
+| Live static cache/framing headers | Kept in static deployment config; site test checks them. |
+| Narrow text targets | Rechecked at 44px or larger. |
+| Missing claims registry | Fixed with 18 declared, tagged tests. |
+| Missing CLI/browser sandbox | Fixed with `repo-protocol demo`, `/demo`, sample label, reset, and discard. |
+| Metaphor-first copy and missing audit | Fixed with job-first copy and `.factory/copy-audit.md`. |
+| Missing legal/404/routes/social/footer | Fixed in the static site and routing code. |
+
+## Known gap
+
+Only the live rollout remains: the public site is still the prior deployment
+despite the successful source push. Do not use the old HTTPS page as evidence
+of this repair until the static deployment controller publishes `8d60b1f`.
